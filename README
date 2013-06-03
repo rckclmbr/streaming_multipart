@@ -1,0 +1,12 @@
+A streaming multipart parser.
+
+Usage:
+
+from streaming_multipart import MultipartReader
+
+reader = MultiPartReader(stream, boundary)
+part1 = reader.next_part()
+print part1.form_name()
+print part1.read(1024)  # Read 1024 bytes from part stream
+part2 = reader.next_part()
+print part2.read()  # Read all data
