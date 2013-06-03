@@ -17,7 +17,6 @@ args = {
     'maintainer_email': 'rckclmbr@gmail.com',
     'license': 'BSD',
     'packages': ["streaming_multipart"],
-    'package_dir': {'': 'src'},
     'classifiers': [
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
