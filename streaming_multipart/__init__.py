@@ -3,6 +3,8 @@
 """
 A streaming multipart content reader.  Unlike every other multipart streaming library,
 contents aren't cached to a file, or stored in memory.
+
+https://github.com/rckclmbr/streaming_multipart
 """
 
 from io import BufferedReader
@@ -53,10 +55,31 @@ class _StreamWrapper(object):
     def readable(self):
         return True
 
+    @property
+    def closed(self):
+        return False
+
+    def readinto(self, b):
+        if hasattr(self._wrapped, "readinto"):
+            return self._wrapped.readinto(b)
+
+        size = len(b)
+        # print "readinto", size
+        buf = self._wrapped.read(size)
+        if not buf:
+            return
+        if len(buf) == 0:
+            return None
+        for i, c in enumerate(buf):
+            b[i] = c
+        # print len(b.tobytes())
+        return len(buf)
+
     def __init__(self, wrapped):
         self._wrapped = wrapped
 
     def __getattr__(self, n):
+        # print n
         return getattr(self._wrapped, n)
 
 
@@ -285,8 +308,8 @@ class Part(object):
         """ Reads d bytes from the body of the part.  If the end, and empty string will be returned """
         if self.closed:
             raise IOError("Part already closed")
-
         if d is None:
+            data = ""
             while True:
                 d = str(self.r.read(BLOCK_SIZE))
                 if len(d) == 0:
@@ -295,6 +318,9 @@ class Part(object):
             return data
         else:
             return str(self.r.read(d))
+
+    def readline(self):
+        raise NotImplementedError()
 
 
 if __name__ == "__main__":
